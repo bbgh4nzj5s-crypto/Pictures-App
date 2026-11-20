@@ -1,0 +1,42 @@
+
+name: Make coordinate and parts JSON packs
+
+on:
+  workflow_dispatch:
+    inputs:
+      pages:
+        description: 'Page IDs: 1, oa1, ring1, special, comma separated, or all'
+        required: true
+        default: '1'
+        type: string
+
+jobs:
+  make-packs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install browser tools
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Create image packs
+        run: python run_pack.py --pages "$PAGES"
+        env:
+          PAGES: ${{ inputs.pages }}
+
+      - name: Upload packs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aipri-json-packs
+          path: aipri-packs/
+          if-no-files-found: warn
+          retention-days: 7
