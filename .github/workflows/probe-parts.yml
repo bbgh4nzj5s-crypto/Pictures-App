@@ -1,0 +1,34 @@
+
+name: Inspect part image URLs
+
+on:
+  workflow_dispatch:
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Playwright
+        run: |
+          pip install playwright
+          python -m playwright install chromium --with-deps
+
+      - name: Inspect images
+        run: python probe_parts.py
+
+      - name: Upload investigation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: part-image-investigation
+          path: |
+            *.json
+            *.txt
+            *.png
+          if-no-files-found: warn
