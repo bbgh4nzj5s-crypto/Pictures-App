@@ -27,8 +27,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: part-image-investigation
-          path: |
-            *.json
-            *.txt
-            *.png
+          
+          path: part_probe/
+  
           if-no-files-found: warn
